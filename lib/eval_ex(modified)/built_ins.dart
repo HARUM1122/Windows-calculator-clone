@@ -86,7 +86,10 @@ void addBuiltIns(Expression e) {
 
   e.addOperator(OperatorImpl("logbase", 50, true, fEval: (v1, v2) {
     if(v1.toDouble()==0||v2.toDouble()==0){
-      throw const ExpressionException('.');
+      throw const ExpressionException('Invalid input');
+    }
+    if(v2.toDouble()==1){
+      throw const ExpressionException('Cannot divide by 0');
     }
     return Decimal.parse((math.log(v1.toDouble())/math.log(v2.toDouble())).toString());
   })); 
@@ -101,7 +104,7 @@ void addBuiltIns(Expression e) {
         throw const ExpressionException("Overflow");
       } 
       else if (val.isNaN){
-        throw const ExpressionException('.');
+        throw const ExpressionException('Invalid input');
       }
       return Decimal.parse(val.toString());
   }));
