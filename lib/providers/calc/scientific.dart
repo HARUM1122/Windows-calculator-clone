@@ -308,7 +308,9 @@ class ScientificCalcProvider extends ChangeNotifier{
       }
     }
     else if(parenthesisCount!=0){
-      expression+="${expression.endsWith('(')?'':' '}$screenText";
+      if(!expression.endsWith(')')){
+        expression+="${expression.endsWith('(')?'':' '}$screenText";
+      }
     }
     expression+=")"*parenthesisCount;
     parenthesisCount=0;
