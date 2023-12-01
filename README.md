@@ -13,4 +13,4 @@ Windows 10 calculator clone written using dart and flutter
 ## Unit converters
 ![](Screenshots/UnitConverter.jpg) ![](Screenshots/SideMenu.jpg)
 
-[Project video](https://youtu.be/7V23lSN-jCw?si=4JUeKepfw4TnSbxw)
+Check out the video of this project on [Youtube](https://youtu.be/7V23lSN-jCw?si=4JUeKepfw4TnSbxw)
