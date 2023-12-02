@@ -17,21 +17,15 @@ class HistoryProvider extends ChangeNotifier{
       standardHistory.removeAt(index);
     }
     else{
-      standardHistory.removeAt(index);
+      scientificHistory.removeAt(index);
     }
     notifyListeners();
   }
   void clearHistory({bool standard=true}){
-    if(standard){
-      if(standardHistory.isEmpty){
-        return;
-      }
+    if(standard && standardHistory.isNotEmpty){
       standardHistory.clear();
     }
-    else{
-      if(scientificHistory.isEmpty){
-        return;
-      }
+    else if(!standard&&scientificHistory.isNotEmpty){
       scientificHistory.clear();
     }
     notifyListeners();
