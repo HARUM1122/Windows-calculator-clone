@@ -589,7 +589,7 @@ class KeyPad{
                     top:28,
                     left:40,
                     child:Text(
-                      scientificProv.parenthesisCount.toString()=="0"?'':scientificProv.parenthesisCount.toString(),
+                      scientificProv.parenthesesCount.toString()=="0"?'':scientificProv.parenthesesCount.toString(),
                       style:const TextStyle(
                         color:Colors.white,
                         fontSize:12

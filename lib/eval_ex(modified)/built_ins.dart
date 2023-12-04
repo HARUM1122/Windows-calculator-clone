@@ -85,10 +85,10 @@ void addBuiltIns(Expression e) {
   })); // changed % to mod
 
   e.addOperator(OperatorImpl("logbase", 50, true, fEval: (v1, v2) {
-    if(v1.toDouble()==0||v2.toDouble()==0){
+    if(v1==Decimal.zero||v2==Decimal.zero){
       throw const ExpressionException('Invalid input');
     }
-    if(v2.toDouble()==1){
+    if(v2==Decimal.one){
       throw const ExpressionException('Cannot divide by 0');
     }
     return Decimal.parse((math.log(v1.toDouble())/math.log(v2.toDouble())).toString());
