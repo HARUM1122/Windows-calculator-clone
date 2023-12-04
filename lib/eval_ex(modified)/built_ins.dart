@@ -544,7 +544,7 @@ void addBuiltIns(Expression e) {
       if(val<-1e60||val>1e60){
         throw const ExpressionException("Invalid input");
       }
-      Decimal.parse(n.csch(val).toString());
+      return Decimal.parse(n.csch(val).toString());
     },
 
 
@@ -556,10 +556,8 @@ void addBuiltIns(Expression e) {
       if(val<-1e60||val>1e60){
         throw const ExpressionException("Invalid input");
       }
-      Decimal.parse(n.coth(val).toString());
+      return Decimal.parse(n.coth(val).toString());
     },
-
-////////////////////////////////////////////////////////
 
     'sinh_': (List<Decimal> args){
       final double val = args.first.toDouble();
