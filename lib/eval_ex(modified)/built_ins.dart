@@ -200,7 +200,7 @@ void addBuiltIns(Expression e) {
 
     'tanD_': (List<Decimal> args){
       final double val = args.first.toDouble();
-      if(val<-1||val>1){
+      if(val<-1e60||val>1e60){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.atan(val),'D',inverse:true).toString());
@@ -212,7 +212,7 @@ void addBuiltIns(Expression e) {
       if(val==0){
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1||val>1){
+      if((val>0&&val<1)||(val<-1e60||val>1e60)){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.asec(val),'D',inverse:true).toString());
@@ -225,7 +225,7 @@ void addBuiltIns(Expression e) {
       if(val==0){
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1||val>1){
+      if((val>0&&val<1)||(val<-1e60||val>1e60)){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.acsc(val),'D',inverse:true).toString());
@@ -237,7 +237,7 @@ void addBuiltIns(Expression e) {
       if(val==0){
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1||val>1){
+      if(val<-1e60||val>1e60){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.acot(val),'D',inverse:true).toString());
@@ -327,7 +327,7 @@ void addBuiltIns(Expression e) {
 
     'tanR_': (List<Decimal> args){
       final double val = args.first.toDouble();
-      if(val<-1||val>1){
+      if(val<-1e60||val>1e60){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.atan(val),'R',inverse:true).toString());
@@ -339,7 +339,7 @@ void addBuiltIns(Expression e) {
       if(val==0){
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1||val>1){
+      if((val>0&&val<1)||(val<-1e60||val>1e60)){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.asec(val),'R',inverse:true).toString());
@@ -352,7 +352,7 @@ void addBuiltIns(Expression e) {
       if(val==0){
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1||val>1){
+      if((val>0&&val<1)||(val<-1e60||val>1e60)){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.acsc(val),'R',inverse:true).toString());
@@ -364,7 +364,7 @@ void addBuiltIns(Expression e) {
       if(val==0){
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1||val>1){
+      if(val<-1e60||val>1e60){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.acot(val),'R',inverse:true).toString());
@@ -457,7 +457,7 @@ void addBuiltIns(Expression e) {
 
     'tanG_': (List<Decimal> args){
       final double val = args.first.toDouble();
-      if(val<-1||val>1){
+      if(val<-1e60||val>1e60){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.atan(val),'G',inverse:true).toString());
@@ -469,20 +469,18 @@ void addBuiltIns(Expression e) {
       if(val==0){
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1||val>1){
+      if((val>0&&val<1)||(val<-1e60||val>1e60)){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.asec(val),'G',inverse:true).toString());
     },
-
-
 
     'cscG_': (List<Decimal> args){
       final double val = args.first.toDouble();
       if(val==0){
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1||val>1){
+      if((val>0&&val<1)||(val<-1e60||val>1e60)){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.acsc(val),'G',inverse:true).toString());
@@ -494,7 +492,7 @@ void addBuiltIns(Expression e) {
       if(val==0){
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1||val>1){
+      if(val<-1e60||val>1e60){
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(_convertAngle(n.acot(val),'G',inverse:true).toString());
