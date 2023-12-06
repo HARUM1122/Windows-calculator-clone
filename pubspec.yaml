@@ -14,6 +14,7 @@ dependencies:
   dart_numerics: ^0.0.6
   latext: ^0.1.0
   decimal: ^2.3.3
+  shared_preferences: ^2.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
