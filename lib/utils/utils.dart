@@ -23,7 +23,6 @@ String addCommas(String number){
   return n.length==2?"$res.${n[1]}":res;
 }
 
-
 String trimTrailingZeros(String number) {
   if(number.contains(',')){
     number = number.replaceAll(',', '');
@@ -50,5 +49,4 @@ String standardToScientific(String number,{num pos = 1e16, num neg = -1e16}){
     return n.toStringAsExponential(6);
   }
   return number;
-  
 }

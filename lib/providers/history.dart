@@ -12,13 +12,13 @@ class HistoryProvider extends ChangeNotifier{
   }
   void addToHistory(String ans,{bool standard=true}){
     if(standard){
-      if(standardHistory.length==60){
+      if(standardHistory.length==100){
         standardHistory.removeLast();
       }
       standardHistory.insert(0,ans);
     }
     else{
-      if(scientificHistory.length==60){
+      if(scientificHistory.length==100){
         scientificHistory.removeLast();
       }
       scientificHistory.insert(0,ans);

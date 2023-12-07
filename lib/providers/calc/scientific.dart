@@ -15,9 +15,7 @@ class ScientificCalcProvider extends ChangeNotifier{
   bool clearAll = true;
   bool calculated=false;
   bool errorOccurred=false;
-  bool expUsed=false; 
   List<int> openingParenthesesStack = [-1];
-
   bool _isDigit(String s)=> int.tryParse(s)!=null;
 
   String _getLast(String s)=> s.isEmpty?'':s.substring(s.length-1);
@@ -95,7 +93,7 @@ class ScientificCalcProvider extends ChangeNotifier{
       throwError(msg:e.msg=='Overflow' || e.msg=='Cannot divide by 0'?e.msg:'Invalid input');
       return 'E';
     }
-  }
+  }                                                                                      
   void changeBool(int op){
     switch(op){
       case 0:
@@ -124,7 +122,12 @@ class ScientificCalcProvider extends ChangeNotifier{
     }
     typed=true;
     clearAll=false;
-    if(expUsed){
+    if(opUsed||parenthesisUsed){
+      parenthesisUsed=false;
+      opUsed=false;
+      screenText=value=='.'?'0':'';
+    }
+    if(screenText.contains('e')){
       if((screenText.contains('e+')&&screenText.split('e+').last.length>=2)||(screenText.contains('e-')&&screenText.split('e-').last.length>=2)){
         return;
       }
@@ -138,11 +141,7 @@ class ScientificCalcProvider extends ChangeNotifier{
     if((screenText.contains('.')&&value=='.')||screenText.replaceAll('.','').replaceAll(',','').length==20){
       return;
     }
-    if(opUsed||parenthesisUsed){
-      parenthesisUsed=false;
-      opUsed=false;
-      screenText=value=='.'?screenText:'';
-    }
+    
     screenText = screenText == '0' && value != '.'?value:screenText+value;
     screenText = addCommas(screenText);
     notify();
@@ -154,7 +153,6 @@ class ScientificCalcProvider extends ChangeNotifier{
     }
     typed = true;
     clearAll=false;
-    expUsed=false;
     screenText = value;
     notify();
   }
@@ -182,7 +180,7 @@ class ScientificCalcProvider extends ChangeNotifier{
   }
 
   void useExp(){
-    if(screenText.contains('e') || screenText=='0'){
+    if(screenText.contains('e') || screenText=='0' || opUsed||parenthesisUsed){
       return;
     }
     if(screenText.startsWith('-')){
@@ -192,8 +190,6 @@ class ScientificCalcProvider extends ChangeNotifier{
     else{
       screenText+='e+0';
     }
-    
-    expUsed=true;
     notify();
   }
   void del(){
@@ -202,7 +198,6 @@ class ScientificCalcProvider extends ChangeNotifier{
       clear(reset:true,sc: errorOccurred);
     }
     else if(screenText.endsWith('e+0')||screenText.endsWith('e-0')){
-      expUsed=false;
       screenText = screenText.substring(0,screenText.length-3);
     }
     else if(screenText.length>1){
@@ -239,7 +234,6 @@ class ScientificCalcProvider extends ChangeNotifier{
       openingParenthesesStack.add(lastOpeningParenthesis);
       openingParenthesesStack.add(lastOpeningParenthesis);
       parenthesesCount++;
-      expUsed=false;
       typed=false;
       opUsed=false;
       screenText = addCommas(screenText);
@@ -251,7 +245,6 @@ class ScientificCalcProvider extends ChangeNotifier{
       openingParenthesesStack.removeLast();
       expression+=parenthesis;
       parenthesesCount--;
-      expUsed=false;
       typed=false;
       opUsed=false;
       final String ans = evaluateExpression(parseExpression(expression));
@@ -270,7 +263,6 @@ class ScientificCalcProvider extends ChangeNotifier{
     screenText = trimTrailingZeros(screenText);
     final String sc = standardToScientific(screenText,pos:1e20,neg:-1e20);
     typed=false;
-    expUsed=false;
     if(!opUsed){
       opUsed=true;
       if(expression.endsWith(")")){
@@ -317,7 +309,6 @@ class ScientificCalcProvider extends ChangeNotifier{
     parenthesisUsed=true;
     typed=false;
     opUsed=false;
-    expUsed=false;
     screenText = addCommas(screenText);
     notify();
   }
@@ -334,32 +325,40 @@ class ScientificCalcProvider extends ChangeNotifier{
     openingParenthesesStack=[-1];
     screenText = sc?'0':screenText;
     typed=false;
-    expUsed=false;
     clearAll=true;
     notify();
   }
 
   void eql(Function? add){
-    if(errorOccurred||calculated){
+    if(errorOccurred){
       clear(sc: errorOccurred);
+      return;
     }
     screenText = standardToScientific(trimTrailingZeros(screenText),pos:1e20,neg:-1e20);
-
-    if((typed||opUsed||!_containDigits(expression))&&parenthesesCount==0){
-      if(expression.endsWith(")")){
-        expression+=' × $screenText';
-      }
-      else{
-        expression = ("$expression $screenText").trim();
-      }
+    if(calculated){
+      final List<String> exp = expression.split(' ');
+      exp.first = screenText;
+      exp.removeLast();
+      expression = exp.join(' ');
     }
-    else if(parenthesesCount!=0){
-      if(!expression.endsWith(')')){
-        expression+="${expression.endsWith('(')?'':' '}$screenText";
+    else{
+      if((typed||opUsed||!_containDigits(expression))&&parenthesesCount==0){
+        if(expression.endsWith(")")){
+          expression+=' × $screenText';
+        }
+        else{
+          expression = ("$expression $screenText").trim();
+        }
       }
+      else if(parenthesesCount!=0){
+        if(!expression.endsWith(')')){
+          expression+="${expression.endsWith('(')?'':' '}$screenText";
+        }
+      }
+      expression+=")"*parenthesesCount;
+      parenthesesCount=0;
     }
-    expression+=")"*parenthesesCount;
-    parenthesesCount=0;
+    
     final String ans = evaluateExpression(expression);
     if(ans=="E"){
       return;
