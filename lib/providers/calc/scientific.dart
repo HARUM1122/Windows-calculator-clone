@@ -253,6 +253,9 @@ class ScientificCalcProvider extends ChangeNotifier{
       }
       screenText = addCommas(standardToScientific(ans,pos:1e20,neg:-1e20));
     }
+    else {
+      screenText = addCommas(screenText);
+    }
     notify();
   }
 

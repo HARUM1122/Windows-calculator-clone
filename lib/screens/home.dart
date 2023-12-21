@@ -22,6 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         elevation:0,
         backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(
+          color: Colors.white
+        ),
         title:Consumer<DrawerProvider>(
           builder:(context,drawerProv,_)=>
           Text(
