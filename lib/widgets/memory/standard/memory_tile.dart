@@ -60,9 +60,9 @@ class MemoryTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    style:const ButtonStyle(
-                    backgroundColor:MaterialStatePropertyAll(Color.fromRGBO(45,45,45,1)),
-                    overlayColor:MaterialStatePropertyAll(Colors.transparent),
+                    style: const ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Color.fromRGBO(45,45,45,1)),
+                    overlayColor: MaterialStatePropertyAll(Colors.transparent),
                     ),
                     onPressed: ()=>memoryProv.updateMemory(index,standardCalcProv, true),
                     child:const Text("M+"),
@@ -70,11 +70,12 @@ class MemoryTile extends StatelessWidget {
                   const SizedBox(width:4),
                   ElevatedButton(
                     style:const ButtonStyle(
-                    backgroundColor:MaterialStatePropertyAll(Color.fromRGBO(45,45,45,1)),
-                    overlayColor:MaterialStatePropertyAll(Colors.transparent)
+                    backgroundColor: MaterialStatePropertyAll(Color.fromRGBO(45,45,45,1)),
+                    overlayColor: MaterialStatePropertyAll(Colors.transparent),
                     ),
                     onPressed: ()=>memoryProv.updateMemory(index,standardCalcProv, false),
                     child:const Text("M-"),
+  
                   ),
                 ],
               )

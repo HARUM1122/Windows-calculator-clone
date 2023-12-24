@@ -14,7 +14,6 @@ class DateCalculator extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             TabBar(
-              labelColor: Colors.white,
               indicatorPadding: EdgeInsets.symmetric(horizontal: 40),
               indicatorColor: Color.fromRGBO(118, 185, 237,1),
               overlayColor: MaterialStatePropertyAll<Color>(Colors.transparent),

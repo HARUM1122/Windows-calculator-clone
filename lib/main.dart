@@ -26,9 +26,12 @@ class Calculator extends StatelessWidget {
         ChangeNotifierProvider(create: (_)=>DialogProvider()),
         ChangeNotifierProvider(create: (_)=>UnitProvider()),
       ],
-      child:const MaterialApp(
+      child:MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: SplashScreen()
+        theme: ThemeData(
+          useMaterial3: false
+        ),
+        home: const SplashScreen()
       )
     );
   }
