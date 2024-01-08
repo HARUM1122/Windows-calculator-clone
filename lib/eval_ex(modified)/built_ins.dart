@@ -33,23 +33,27 @@ import 'abstract_operator.dart';
 import 'abstract_unary_operator.dart';
 import 'expression.dart';
 
-double _convertAngle(double angle,String currentAngleUnit,{ bool inverse = false}) {
-  switch(currentAngleUnit){
+double _convertAngle(double angle, String currentAngleUnit,
+    {bool inverse = false}) {
+  switch (currentAngleUnit) {
     case 'D':
-      return inverse?n.radianToDegree(angle):n.degreeToRadian(angle);
+      return inverse ? n.radianToDegree(angle) : n.degreeToRadian(angle);
     case 'G':
-      return inverse?n.radianToGrad(angle):n.degreeToRadian(n.gradToDegree(angle));
+      return inverse
+          ? n.radianToGrad(angle)
+          : n.degreeToRadian(n.gradToDegree(angle));
     default:
       return angle;
   }
 } // ADDED A FUNCTION FOR CONVERTING ANGLE
 
 void addBuiltIns(Expression e) {
-  e.addOperator(OperatorImpl("+", Expression.operatorPrecedenceAdditive, true, fEval: (v1, v2) {
+  e.addOperator(OperatorImpl("+", Expression.operatorPrecedenceAdditive, true,
+      fEval: (v1, v2) {
     Decimal n = v1 + v2;
-    if(n.toDouble().isInfinite){
+    if (n.toDouble().isInfinite) {
       throw const ExpressionException('Overflow');
-    }    
+    }
     return n;
   }));
 
@@ -58,11 +62,12 @@ void addBuiltIns(Expression e) {
     return v1 - v2;
   }));
 
-  e.addOperator(OperatorImpl("×", Expression.operatorPrecedenceMultiplicative, true, fEval: (v1, v2) {
+  e.addOperator(OperatorImpl(
+      "×", Expression.operatorPrecedenceMultiplicative, true, fEval: (v1, v2) {
     Decimal n = v1 * v2;
-    if(n.toDouble().isInfinite){
+    if (n.toDouble().isInfinite) {
       throw const ExpressionException('Overflow');
-    }    
+    }
     return n;
   })); // changed * to ×
 
@@ -74,574 +79,557 @@ void addBuiltIns(Expression e) {
     return (v1 / v2).toDecimal(scaleOnInfinitePrecision: 32);
   }));
 
-  e.addOperator(OperatorImpl(
-      "mod", Expression.operatorPrecedenceMultiplicative, true, fEval: (v1, v2) {
+  e.addOperator(
+      OperatorImpl("mod", Expression.operatorPrecedenceMultiplicative, true,
+          fEval: (v1, v2) {
     return v1 % v2;
   })); // changed % to mod
 
   e.addOperator(OperatorImpl(
       "%", Expression.operatorPrecedenceMultiplicative, true, fEval: (v1, v2) {
-    return Decimal.parse((v1.toDouble()/100*v2.toDouble()).toString());
+    return Decimal.parse((v1.toDouble() / 100 * v2.toDouble()).toString());
   })); // changed % to mod
 
   e.addOperator(OperatorImpl("logbase", 50, true, fEval: (v1, v2) {
-    if(v1==Decimal.zero||v2==Decimal.zero){
+    if (v1 == Decimal.zero || v2 == Decimal.zero) {
       throw const ExpressionException('Invalid input');
     }
-    if(v2==Decimal.one){
+    if (v2 == Decimal.one) {
       throw const ExpressionException('Cannot divide by 0');
     }
-    return Decimal.parse((math.log(v1.toDouble())/math.log(v2.toDouble())).toString());
-  })); 
-  e.addOperator(OperatorImpl(
-    "yroot", 35, true, fEval: (v1, v2) {
-      return Decimal.parse((math.pow(v1.toDouble(),1/v2.toDouble())).toString());
-  })); 
-  e.addOperator(
-    OperatorImpl("^", e.powerOperatorPrecedence, false, fEval: (v1, v2) {
-      double val = math.pow(v1.toDouble(), v2.toDouble()).toDouble();
-      if (val.isInfinite){
-        throw const ExpressionException("Overflow");
-      } 
-      else if (val.isNaN){
-        throw const ExpressionException('Invalid input');
-      }
-      return Decimal.parse(val.toString());
+    return Decimal.parse(
+        (math.log(v1.toDouble()) / math.log(v2.toDouble())).toString());
   }));
-  
+  e.addOperator(OperatorImpl("yroot", 35, true, fEval: (v1, v2) {
+    return Decimal.parse(
+        (math.pow(v1.toDouble(), 1 / v2.toDouble())).toString());
+  }));
+  e.addOperator(
+      OperatorImpl("^", e.powerOperatorPrecedence, false, fEval: (v1, v2) {
+    double val = math.pow(v1.toDouble(), v2.toDouble()).toDouble();
+    if (val.isInfinite) {
+      throw const ExpressionException("Overflow");
+    } else if (val.isNaN) {
+      throw const ExpressionException('Invalid input');
+    }
+    return Decimal.parse(val.toString());
+  }));
+
   e.addOperator(UnaryOperatorImpl(
       "-", Expression.operatorPrecedenceUnary, false, fEval: (v1) {
     return v1 * Decimal.fromInt(-1);
   }));
 
   /// MODIFIED
-  final Map<String,Function(List<Decimal>)> trigonometry = {
+  final Map<String, Function(List<Decimal>)> trigonometry = {
     // DEG
     'cosD': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = n.cos(_convertAngle(val,'D'));
+      final double ans = n.cos(_convertAngle(val, 'D'));
       return Decimal.parse(ans.toString());
     },
     'sinD': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = n.sin(_convertAngle(val,'D'));
+      final double ans = n.sin(_convertAngle(val, 'D'));
       return Decimal.parse(ans.toString());
     },
 
     'tanD': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = n.tan(_convertAngle(val,'D'));
+      final double ans = n.tan(_convertAngle(val, 'D'));
       return Decimal.parse(ans.toString());
     },
 
     'secD': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      
-      final double ans = 1 / n.cos(_convertAngle(val,'D'));
+
+      final double ans = 1 / n.cos(_convertAngle(val, 'D'));
       return Decimal.parse(ans.toString());
     },
-
-
-
 
     'cscD': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = 1 / n.sin(_convertAngle(val,'D'));
+      final double ans = 1 / n.sin(_convertAngle(val, 'D'));
       return Decimal.parse(ans.toString());
     },
 
-
-    'cotD': (List<Decimal> args){
+    'cotD': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = 1 / n.tan(_convertAngle(val,'D'));
+      final double ans = 1 / n.tan(_convertAngle(val, 'D'));
       return Decimal.parse(ans.toString());
     },
-    
-    'cosD_': (List<Decimal> args){
+
+    'cosD_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1||val>1){
+      if (val < -1 || val > 1) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.acos(val),'D',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.acos(val), 'D', inverse: true).toString());
     },
 
-    'sinD_': (List<Decimal> args){ 
+    'sinD_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1||val>1){
+      if (val < -1 || val > 1) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.asin(val),'D',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.asin(val), 'D', inverse: true).toString());
     },
 
-
-    'tanD_': (List<Decimal> args){
+    'tanD_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.atan(val),'D',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.atan(val), 'D', inverse: true).toString());
     },
 
-
-    'secD_': (List<Decimal> args){
+    'secD_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if((val>0&&val<1)||(val<-1e60||val>1e60)){
+      if ((val > 0 && val < 1) || (val < -1e60 || val > 1e60)) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.asec(val),'D',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.asec(val), 'D', inverse: true).toString());
     },
 
-
-
-    'cscD_': (List<Decimal> args){
+    'cscD_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if((val>0&&val<1)||(val<-1e60||val>1e60)){
+      if ((val > 0 && val < 1) || (val < -1e60 || val > 1e60)) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.acsc(val),'D',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.acsc(val), 'D', inverse: true).toString());
     },
 
-
-    'cotD_': (List<Decimal> args){
+    'cotD_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.acot(val),'D',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.acot(val), 'D', inverse: true).toString());
     },
 
     // RAD
     'cosR': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = n.cos(_convertAngle(val,'R'));
+      final double ans = n.cos(_convertAngle(val, 'R'));
       return Decimal.parse(ans.toString());
     },
     'sinR': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = n.sin(_convertAngle(val,'R'));
+      final double ans = n.sin(_convertAngle(val, 'R'));
       return Decimal.parse(ans.toString());
     },
 
     'tanR': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = n.tan(_convertAngle(val,'R'));
+      final double ans = n.tan(_convertAngle(val, 'R'));
       return Decimal.parse(ans.toString());
     },
 
     'secR': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      
-      final double ans = 1 / n.cos(_convertAngle(val,'R'));
+
+      final double ans = 1 / n.cos(_convertAngle(val, 'R'));
       return Decimal.parse(ans.toString());
     },
 
     'cscR': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = 1 / n.sin(_convertAngle(val,'R'));
+      final double ans = 1 / n.sin(_convertAngle(val, 'R'));
       return Decimal.parse(ans.toString());
     },
 
-
-    'cotR': (List<Decimal> args){
+    'cotR': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = 1 / n.tan(_convertAngle(val,'R'));
+      final double ans = 1 / n.tan(_convertAngle(val, 'R'));
       return Decimal.parse(ans.toString());
     },
-    
 
-
-
-    'cosR_': (List<Decimal> args){
+    'cosR_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1||val>1){
+      if (val < -1 || val > 1) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.acos(val),'R',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.acos(val), 'R', inverse: true).toString());
     },
 
-    'sinR_': (List<Decimal> args){ 
+    'sinR_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1||val>1){
+      if (val < -1 || val > 1) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.asin(val),'R',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.asin(val), 'R', inverse: true).toString());
     },
 
-
-    'tanR_': (List<Decimal> args){
+    'tanR_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.atan(val),'R',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.atan(val), 'R', inverse: true).toString());
     },
 
-
-    'secR_': (List<Decimal> args){
+    'secR_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if((val>0&&val<1)||(val<-1e60||val>1e60)){
+      if ((val > 0 && val < 1) || (val < -1e60 || val > 1e60)) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.asec(val),'R',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.asec(val), 'R', inverse: true).toString());
     },
 
-
-
-    'cscR_': (List<Decimal> args){
+    'cscR_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if((val>0&&val<1)||(val<-1e60||val>1e60)){
+      if ((val > 0 && val < 1) || (val < -1e60 || val > 1e60)) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.acsc(val),'R',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.acsc(val), 'R', inverse: true).toString());
     },
 
-
-    'cotR_': (List<Decimal> args){
+    'cotR_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.acot(val),'R',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.acot(val), 'R', inverse: true).toString());
     },
 
     // GRAD
     'cosG': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = n.cos(_convertAngle(val,'G'));
+      final double ans = n.cos(_convertAngle(val, 'G'));
       return Decimal.parse(ans.toString());
     },
     'sinG': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = n.sin(_convertAngle(val,'G'));
+      final double ans = n.sin(_convertAngle(val, 'G'));
       return Decimal.parse(ans.toString());
     },
 
     'tanG': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = n.tan(_convertAngle(val,'G'));
+      final double ans = n.tan(_convertAngle(val, 'G'));
       return Decimal.parse(ans.toString());
     },
 
     'secG': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      
-      final double ans = 1 / n.cos(_convertAngle(val,'G'));
+
+      final double ans = 1 / n.cos(_convertAngle(val, 'G'));
       return Decimal.parse(ans.toString());
     },
-
-
-
 
     'cscG': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = 1 / n.sin(_convertAngle(val,'G'));
+      final double ans = 1 / n.sin(_convertAngle(val, 'G'));
       return Decimal.parse(ans.toString());
     },
 
-
-    'cotG': (List<Decimal> args){
+    'cotG': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      final double ans = 1 / n.tan(_convertAngle(val,'G'));
+      final double ans = 1 / n.tan(_convertAngle(val, 'G'));
       return Decimal.parse(ans.toString());
     },
-    
 
-
-
-    'cosG_': (List<Decimal> args){
+    'cosG_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1||val>1){
+      if (val < -1 || val > 1) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.acos(val),'G',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.acos(val), 'G', inverse: true).toString());
     },
 
-    'sinG_': (List<Decimal> args){ 
+    'sinG_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1||val>1){
+      if (val < -1 || val > 1) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.asin(val),'G',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.asin(val), 'G', inverse: true).toString());
     },
 
-
-    'tanG_': (List<Decimal> args){
+    'tanG_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.atan(val),'G',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.atan(val), 'G', inverse: true).toString());
     },
 
-
-    'secG_': (List<Decimal> args){
+    'secG_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if((val>0&&val<1)||(val<-1e60||val>1e60)){
+      if ((val > 0 && val < 1) || (val < -1e60 || val > 1e60)) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.asec(val),'G',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.asec(val), 'G', inverse: true).toString());
     },
 
-    'cscG_': (List<Decimal> args){
+    'cscG_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if((val>0&&val<1)||(val<-1e60||val>1e60)){
+      if ((val > 0 && val < 1) || (val < -1e60 || val > 1e60)) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.acsc(val),'G',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.acsc(val), 'G', inverse: true).toString());
     },
 
-
-    'cotG_': (List<Decimal> args){
+    'cotG_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
-      return Decimal.parse(_convertAngle(n.acot(val),'G',inverse:true).toString());
+      return Decimal.parse(
+          _convertAngle(n.acot(val), 'G', inverse: true).toString());
     },
 
     // HYPERBOLIC
-    'sinh': (List<Decimal> args){
+    'sinh': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.sinh(val).toString());
     },
 
-    'cosh': (List<Decimal> args){
+    'cosh': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.cosh(val).toString());
     },
 
-
-    'tanh': (List<Decimal> args){
+    'tanh': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.tanh(val).toString());
     },
 
-
     'sech': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.sech(val).toString());
     },
 
-
-    'csch': (List<Decimal> args){
+    'csch': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.csch(val).toString());
     },
 
-
-    'coth': (List<Decimal> args){
+    'coth': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.coth(val).toString());
     },
 
-    'sinh_': (List<Decimal> args){
+    'sinh_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.asinh(val).toString());
     },
 
-    'cosh_': (List<Decimal> args){
+    'cosh_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val<1||val>1e60){
+      if (val < 1 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.acosh(val).toString());
     },
 
-    'tanh_': (List<Decimal> args){
+    'tanh_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==1){
+      if (val == 1) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<0||val>1){
+      if (val < 0 || val > 1) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.atanh(val).toString());
     },
 
-    'sech_': (List<Decimal> args){
+    'sech_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val>1||val<0){
+      if (val > 1 || val < 0) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.asech(val).toString());
     },
 
-    'csch_': (List<Decimal> args){
+    'csch_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0){
+      if (val == 0) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<-1e60||val>1e60){
+      if (val < -1e60 || val > 1e60) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.acsch(val).toString());
     },
 
-    'coth_': (List<Decimal> args){
+    'coth_': (List<Decimal> args) {
       final double val = args.first.toDouble();
-      if(val==0 || val==1){
+      if (val == 0 || val == 1) {
         throw const ExpressionException("Cannot divide by zero");
       }
-      if(val<1){
+      if (val < 1) {
         throw const ExpressionException("Invalid input");
       }
       return Decimal.parse(n.acoth(val).toString());
     },
   };
 
-  for(String funcName in trigonometry.keys){
-    e.addFunc(
-      FunctionImpl(
-        funcName, 1, 
-        booleanFunction: false, 
-        fEval: trigonometry[funcName]!
-      )
-    );
+  for (String funcName in trigonometry.keys) {
+    e.addFunc(FunctionImpl(funcName, 1,
+        booleanFunction: false, fEval: trigonometry[funcName]!));
   }
   e.addFunc(FunctionImpl("dms", 1, booleanFunction: false, fEval: (params) {
     num n = num.parse(params.first.toString());
-    if(n.toInt()==n) return Decimal.parse(n.toString());
+    if (n.toInt() == n) return Decimal.parse(n.toString());
     int degrees = n.floor();
     double remainingMinutes = (n - degrees) * 60;
     int minutes = remainingMinutes.floor();
     double seconds = (remainingMinutes - minutes) * 60;
-    return Decimal.parse((degrees + (minutes / 100) + (seconds / 10000)).toString());
+    return Decimal.parse(
+        (degrees + (minutes / 100) + (seconds / 10000)).toString());
   }));
 
   e.addFunc(FunctionImpl('fact', 1, booleanFunction: false, fEval: (params) {
     if (params.first.toDouble() > 170) {
       throw const ExpressionException('Overflow');
     }
-    if(params.first.toDouble()<0){
+    if (params.first.toDouble() < 0) {
       throw const ExpressionException('Invalid input');
     }
     int number = params.first.toBigInt().toInt();
@@ -653,44 +641,42 @@ void addBuiltIns(Expression e) {
   }));
 
   e.addFunc(FunctionImpl("sqrt", 1, fEval: (params) {
-    if(params.first.toDouble()<0) {
+    if (params.first.toDouble() < 0) {
       throw const ExpressionException('Invalid input');
     }
-      return Decimal.parse(math.sqrt(params.first.toDouble()).toString());
-    }
-  ));
-  
-  e.addFunc(FunctionImpl("sqr", 1, fEval: (params){
+    return Decimal.parse(math.sqrt(params.first.toDouble()).toString());
+  }));
+
+  e.addFunc(FunctionImpl("sqr", 1, fEval: (params) {
     final Decimal n = params.first * params.first;
-    if(n.toDouble().isInfinite){
+    if (n.toDouble().isInfinite) {
       throw const ExpressionException('Overflow');
     }
     return n;
   }));
 
-  e.addFunc(FunctionImpl("cube", 1, fEval: (params){
+  e.addFunc(FunctionImpl("cube", 1, fEval: (params) {
     final Decimal n = params.first * params.first * params.first;
-    if(n.toDouble().isInfinite){
+    if (n.toDouble().isInfinite) {
       throw const ExpressionException('Overflow');
     }
     return n;
   }));
   e.addFunc(FunctionImpl("cuberoot", 1, fEval: (params) {
     final double n = params.first.toDouble();
-    if(n<0) {
+    if (n < 0) {
       throw const ExpressionException('Invalid input');
     }
-    return Decimal.parse((math.pow(n,1/3)).toString());
-    }
-  ));
-  e.addFunc(FunctionImpl("abs", 1, fEval: (params)=> params.first.abs()));
+    return Decimal.parse((math.pow(n, 1 / 3)).toString());
+  }));
+  e.addFunc(FunctionImpl("abs", 1, fEval: (params) => params.first.abs()));
 
-  e.addFunc(FunctionImpl("floor", 1, fEval: (params)=> params.first.floor()));
+  e.addFunc(FunctionImpl("floor", 1, fEval: (params) => params.first.floor()));
 
-  e.addFunc(FunctionImpl("ceil", 1, fEval: (params)=> params.first.ceil()));
+  e.addFunc(FunctionImpl("ceil", 1, fEval: (params) => params.first.ceil()));
 
   e.addFunc(FunctionImpl("log", 1, fEval: (params) {
-    if(params.first.toDouble()<=0){
+    if (params.first.toDouble() <= 0) {
       throw const ExpressionException(".");
     }
     double d = n.log10(params.first.toDouble());
@@ -698,12 +684,11 @@ void addBuiltIns(Expression e) {
   }));
 
   e.addFunc(FunctionImpl("ln", 1, fEval: (params) {
-    if(params.first.toDouble()<=0) {
+    if (params.first.toDouble() <= 0) {
       throw const ExpressionException('Invalid input');
     }
-      return Decimal.parse(math.log(params.first.toDouble()).toString());
-    }
-  ));
+    return Decimal.parse(math.log(params.first.toDouble()).toString());
+  }));
 
   e.variables["theAnswerToLifeTheUniverseAndEverything"] =
       e.createLazyNumber(Decimal.fromInt(42));

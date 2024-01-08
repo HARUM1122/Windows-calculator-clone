@@ -86,20 +86,18 @@ class Expression {
 
   /// The current infix expression, with optional variable substitutions.
   final String _expressionString;
+
   /// The cached RPN (Reverse Polish Notation) of the expression.
   List<Token>? _rpn;
 
   /// All defined operators with name and implementation.
-  Map<String, ILazyOperator> operators =
-      SplayTreeMap((a, b) => a.compareTo(b));
+  Map<String, ILazyOperator> operators = SplayTreeMap((a, b) => a.compareTo(b));
 
   /// All defined functions with name and implementation.
-  Map<String, ILazyFunction> functions =
-      SplayTreeMap((a, b) => a.compareTo(b));
+  Map<String, ILazyFunction> functions = SplayTreeMap((a, b) => a.compareTo(b));
 
   /// All defined variables with name and value.
-  Map<String, LazyNumber?> variables =
-      SplayTreeMap((a, b) => a.compareTo(b));
+  Map<String, LazyNumber?> variables = SplayTreeMap((a, b) => a.compareTo(b));
 
   /// What character to use for decimal separators.
   static final String _decimalSeparator = ".";
