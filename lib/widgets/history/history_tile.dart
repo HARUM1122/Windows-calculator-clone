@@ -37,6 +37,7 @@ class HistoryTile extends StatelessWidget {
                           ..eql(null);
                       } else {
                         scientificCalcProv
+                          ..clear(reset: true)
                           ..expression = expression
                           ..eql(null);
                       }

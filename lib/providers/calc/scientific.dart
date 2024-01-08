@@ -17,6 +17,7 @@ class ScientificCalcProvider extends ChangeNotifier {
   bool calculated = false;
   bool errorOccurred = false;
   List<int> openingParenthesesStack = [-1];
+
   bool _isDigit(String s) => int.tryParse(s) != null;
 
   String _getLast(String s) => s.isEmpty ? '' : s.substring(s.length - 1);
@@ -370,7 +371,6 @@ class ScientificCalcProvider extends ChangeNotifier {
       expression += ")" * parenthesesCount;
       parenthesesCount = 0;
     }
-
     final String ans = evaluateExpression(expression);
     if (ans == "E") {
       return;
